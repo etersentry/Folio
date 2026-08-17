@@ -29,22 +29,22 @@ export function mountAppearance({ button, prefs }) {
     if (event.key === 'Escape') { event.stopPropagation(); close(); button.focus(); }
   };
 
-  const optionRow = (label, options, current, onPick, renderPreview = null) => el('div.field', {}, [
+  const optionRow = (label, options, current, onPick, { columns = 3 } = {}) => el('div.field', {}, [
     el('span.field__label', {}, [label]),
-    el('div.radio-cards', {}, options.map((option) => el('button.radio-card', {
+    el('div.radio-cards', { style: { gridTemplateColumns: `repeat(${columns}, 1fr)` } }, options.map((option) => el('button.radio-card', {
       type: 'button',
       'aria-pressed': String(current === option.id),
       onclick: () => { onPick(option.id); refresh(); },
-    }, [renderPreview ? renderPreview(option) : null, option.label].filter(Boolean)))),
+    }, [option.label]))),
   ]);
 
   function build() {
     const { theme, accent, background, transparency } = prefs.values;
-    const node = el('div.popover.glass', { role: 'dialog', 'aria-label': 'Apariencia' }, [
+    const node = el('div.popover', { role: 'dialog', 'aria-label': 'Apariencia' }, [
       optionRow('Tema', THEMES, theme, (id) => prefs.set({ theme: id })),
       el('div.field', {}, [
         el('span.field__label', {}, ['Color de acento']),
-        el('div.swatches', { style: { gridTemplateColumns: `repeat(${ACCENTS.length + 1}, 1fr)` } }, [
+        el('div.swatches.swatches--accent', {}, [
           ...ACCENTS.map((option) => el('button.swatch', {
             type: 'button',
             style: { background: option.value },
@@ -57,21 +57,20 @@ export function mountAppearance({ button, prefs }) {
             type: 'color',
             value: accent,
             'aria-label': 'Acento personalizado',
-            style: { width: '100%', height: 'auto', aspectRatio: '1' },
-            oninput: (event) => prefs.set({ accent: event.target.value, }),
+            oninput: (event) => prefs.set({ accent: event.target.value }),
           }),
         ]),
       ]),
-      optionRow('Fondo del área de trabajo', BACKGROUNDS, background, (id) => prefs.set({ background: id })),
+      optionRow('Superficie de la mesa', BACKGROUNDS, background, (id) => prefs.set({ background: id }), { columns: 4 }),
       el('label.switch', {}, [
         el('input', {
           type: 'checkbox',
           checked: transparency,
           onchange: (event) => prefs.set({ transparency: event.target.checked }),
         }),
-        el('span', {}, ['Superficies translúcidas']),
+        el('span', {}, ['Textura y sombras del escritorio']),
       ]),
-      el('p.empty-note', {}, ['Desactiva la transparencia si prefieres máximo contraste o mejor rendimiento.']),
+      el('p.empty-note', {}, ['Desactívalas para una superficie plana, de máximo contraste y menor coste de dibujado.']),
     ]);
     return node;
   }

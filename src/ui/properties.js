@@ -249,7 +249,7 @@ export function mountProperties({ host, titleEl, scopeEl, store, tools, commands
 
     if (has(OBJECT_TYPES.text)) {
       const first = objects.find((o) => o.type === OBJECT_TYPES.text);
-      blocks.push(group('Texto', [
+      blocks.push(group('Tipografía', [
         colorField('Color del texto', first.color, (v, live) => apply('textColor', v, { live })),
         slider('Tamaño', {
           value: first.fontSize, min: 8, max: 96, step: 1, suffix: ' px',

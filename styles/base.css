@@ -1,41 +1,39 @@
 *, *::before, *::after { box-sizing: border-box; }
 
-html, body {
-  height: 100%;
-  margin: 0;
-}
+html, body { height: 100%; margin: 0; }
 
 body {
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 12.5px;
+  line-height: 1.45;
   color: var(--ink);
-  background: var(--stage-bg, var(--app-bg));
+  background: var(--desk);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv05" 1, "ss01" 1;
 }
 
 h1, h2, h3, p, figure { margin: 0; }
 
-button, input, select, textarea {
-  font: inherit;
-  color: inherit;
-}
+button, input, select, textarea { font: inherit; color: inherit; }
 
 kbd {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  padding: 1px 5px;
-  border-radius: 5px;
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
   border: 1px solid var(--line);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--ink-2);
 }
+kbd + kbd { margin-left: 2px; }
 
+/* Foco siempre legible: filete cobre, sin halo difuso. */
 :focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: var(--radius-xs);
+  outline-offset: 1px;
+  border-radius: 3px;
 }
 :focus:not(:focus-visible) { outline: none; }
 
@@ -52,26 +50,27 @@ kbd {
 .skip-link {
   position: absolute;
   top: -60px;
-  left: 12px;
+  left: 10px;
   z-index: 200;
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  background: var(--accent);
-  color: var(--accent-ink);
+  padding: 7px 12px;
+  border-radius: var(--r-control);
+  background: var(--ink);
+  color: var(--surface);
   text-decoration: none;
-  transition: top var(--motion) ease;
+  transition: top var(--motion) var(--ease);
 }
-.skip-link:focus { top: 10px; }
+.skip-link:focus { top: 8px; }
 
-::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+::selection { background: var(--accent-tint-strong); }
 
-/* Scrollbars stay unobtrusive but visible enough to grab. */
+/* Barras de desplazamiento discretas, en la gama cálida. */
 * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
-*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
 *::-webkit-scrollbar-thumb {
   background: var(--line-strong);
-  border-radius: 8px;
+  border-radius: 6px;
   border: 3px solid transparent;
   background-clip: content-box;
 }
+*::-webkit-scrollbar-thumb:hover { background-clip: content-box; background-color: var(--ink-4); }
 *::-webkit-scrollbar-track { background: transparent; }

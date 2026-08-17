@@ -46,20 +46,22 @@ export const PALETTE = Object.freeze([
   '#ffffff', '#8b5e34', '#1d7874', '#0b3d91', '#7a1f3d',
 ]);
 
+/** Acentos de la interfaz: familia cobre/tierra, con una alternativa fría. */
 export const ACCENTS = Object.freeze([
-  { id: 'blue', value: '#4f7cff' },
-  { id: 'violet', value: '#7c5cff' },
-  { id: 'teal', value: '#12a594' },
-  { id: 'green', value: '#2e9e5b' },
-  { id: 'amber', value: '#d98324' },
-  { id: 'rose', value: '#e0455c' },
+  { id: 'cobre', value: '#c66a32' },
+  { id: 'ladrillo', value: '#a8453a' },
+  { id: 'ocre', value: '#b3862b' },
+  { id: 'oliva', value: '#6b7f3a' },
+  { id: 'pizarra', value: '#4a6572' },
+  { id: 'ciruela', value: '#7d4a63' },
 ]);
 
+/** Acabados de la mesa de trabajo (los identificadores se conservan). */
 export const BACKGROUNDS = Object.freeze([
-  { id: 'plain', label: 'Plano' },
-  { id: 'gradient', label: 'Degradado' },
+  { id: 'plain', label: 'Liso' },
+  { id: 'gradient', label: 'Viñeta' },
   { id: 'dots', label: 'Puntos' },
-  { id: 'grid', label: 'Cuadrícula' },
+  { id: 'grid', label: 'Retícula' },
 ]);
 
 export const HISTORY_LIMIT = 120;

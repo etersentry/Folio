@@ -1,132 +1,184 @@
-/* Design tokens: themes, accents, surfaces.
-   Everything visual is expressed through these variables so the UI layers
-   (layout/components) never hard-code a colour. */
+/* Folio — sistema visual "papel sobre escritorio".
+   Toda la interfaz se expresa con estas variables: ninguna capa superior
+   codifica un color directamente. */
 
 :root {
-  --accent: #4f7cff;
+  /* Acento cobre quemado. Lo sobrescribe la preferencia del usuario. */
+  --accent: #c66a32;
   --accent-ink: #ffffff;
 
-  --radius-xs: 6px;
-  --radius-sm: 9px;
-  --radius-md: 13px;
-  --radius-lg: 18px;
+  /* Geometría precisa: radios pequeños, nada de 999px como patrón. */
+  --r-control: 5px;
+  --r-panel: 9px;
+  --r-paper: 2px;
 
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
+  --space-4: 18px;
+  --space-5: 26px;
 
-  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-ui: Inter, "Geist Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-editorial: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino,
+    Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
-  --topbar-h: 52px;
-  --statusbar-h: 28px;
-  --panel-left-w: 268px;
-  --panel-right-w: 276px;
+  --appbar-h: 46px;
+  --statusbar-h: 26px;
+  --index-w: 238px;
+  --inspector-w: 292px;
+  --rail-w: 40px;
 
-  --blur: 18px;
-  --motion: 160ms;
+  /* Transiciones sólo para explicar cambios de estado. */
+  --motion: 120ms;
+  --ease: cubic-bezier(0.2, 0, 0.2, 1);
+
+  /* Azul de precisión para los controles de selección sobre el lienzo:
+     deliberadamente distinto del cobre de la interfaz. */
+  --marquee: #2f6df0;
 }
 
-/* ── Light theme ─────────────────────────────────────────────────────── */
+/* ── Tema claro: papel cálido ─────────────────────────────────────────── */
 :root,
 :root[data-theme="light"] {
   color-scheme: light;
-  --app-bg: #eef1f6;
-  --app-bg-2: #e3e8f2;
-  --surface: 255 255 255;
-  --surface-solid: #ffffff;
-  --surface-alpha: 0.72;
-  --surface-2: #f4f6fa;
-  --ink: #16191f;
-  --ink-2: #4a5160;
-  --ink-3: #79808f;
-  --line: #d7dce6;
-  --line-strong: #bcc4d2;
-  --shadow-1: 0 1px 2px rgb(16 20 30 / 0.06), 0 2px 8px rgb(16 20 30 / 0.06);
-  --shadow-2: 0 8px 30px rgb(16 20 30 / 0.12);
-  --danger: #d43b3b;
-  --ok: #1f9d5b;
-  --warn: #c07a12;
-  --page-shadow: 0 2px 6px rgb(16 20 30 / 0.10), 0 18px 50px rgb(16 20 30 / 0.16);
-  --selection-tint: rgb(79 124 255 / 0.14);
+
+  --desk: #efebe3;
+  --desk-deep: #e4dfd4;
+  --surface: #faf9f6;
+  --surface-sunken: #f0ede6;
+  --surface-raised: #ffffff;
+
+  --ink: #221f1b;
+  --ink-2: #5f5850;
+  --ink-3: #8d857a;
+  --ink-4: #a9a196;
+
+  --line: #e3dfd7;
+  --line-strong: #cfc9be;
+  --line-hair: #edeae3;
+
+  --paper: #ffffff;
+  --paper-edge: rgb(34 31 27 / 0.10);
+  --paper-shadow:
+    0 1px 1px rgb(34 31 27 / 0.05),
+    0 4px 10px rgb(34 31 27 / 0.05),
+    0 14px 34px rgb(34 31 27 / 0.06);
+
+  --accent-tint: color-mix(in srgb, var(--accent) 9%, transparent);
+  --accent-tint-strong: color-mix(in srgb, var(--accent) 15%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 42%, transparent);
+  --accent-text: color-mix(in srgb, var(--accent) 88%, #2b1b10);
+
+  --danger: #b53a2c;
+  --ok: #3f7d4f;
+  --warn: #a8722a;
+
+  --shadow-panel: 0 1px 2px rgb(34 31 27 / 0.05), 0 6px 18px rgb(34 31 27 / 0.07);
+  --overlay-veil: rgb(34 31 27 / 0.28);
 }
 
-/* ── Dark theme ──────────────────────────────────────────────────────── */
+/* ── Tema oscuro: carbón cálido, nunca negro azulado ──────────────────── */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --app-bg: #0d1017;
-  --app-bg-2: #141a26;
-  --surface: 24 29 39;
-  --surface-solid: #181d27;
-  --surface-alpha: 0.68;
-  --surface-2: #1f2531;
-  --ink: #e9edf5;
-  --ink-2: #aab3c4;
-  --ink-3: #7c8598;
-  --line: #2b323f;
-  --line-strong: #3b4453;
-  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 10px rgb(0 0 0 / 0.35);
-  --shadow-2: 0 10px 36px rgb(0 0 0 / 0.5);
-  --danger: #ff6b6b;
-  --ok: #46c98a;
-  --warn: #e0a63c;
-  --page-shadow: 0 2px 8px rgb(0 0 0 / 0.5), 0 24px 60px rgb(0 0 0 / 0.55);
-  --selection-tint: rgb(79 124 255 / 0.22);
+
+  --desk: #1a1815;
+  --desk-deep: #141210;
+  --surface: #221f1b;
+  --surface-sunken: #1c1a17;
+  --surface-raised: #2a2621;
+
+  --ink: #efe9e0;
+  --ink-2: #b5aa9c;
+  --ink-3: #8b8174;
+  --ink-4: #6d645a;
+
+  --line: #332e28;
+  --line-strong: #453e36;
+  --line-hair: #2a2621;
+
+  --paper: #ffffff;
+  --paper-edge: rgb(0 0 0 / 0.5);
+  --paper-shadow:
+    0 1px 2px rgb(0 0 0 / 0.45),
+    0 8px 20px rgb(0 0 0 / 0.4),
+    0 26px 60px rgb(0 0 0 / 0.42);
+
+  --accent-tint: color-mix(in srgb, var(--accent) 22%, transparent);
+  --accent-tint-strong: color-mix(in srgb, var(--accent) 30%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 58%, transparent);
+  --accent-text: color-mix(in srgb, var(--accent) 72%, #ffd9c0);
+
+  --danger: #e0705c;
+  --ok: #6cb37f;
+  --warn: #d9a45c;
+
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
+  --overlay-veil: rgb(10 8 6 / 0.55);
 }
 
-/* Follow the OS when no explicit choice was persisted. */
+/* El tema "sistema" hereda del esquema del sistema operativo. */
 @media (prefers-color-scheme: dark) {
   :root[data-theme="auto"] {
     color-scheme: dark;
-    --app-bg: #0d1017;
-    --app-bg-2: #141a26;
-    --surface: 24 29 39;
-    --surface-solid: #181d27;
-    --surface-alpha: 0.68;
-    --surface-2: #1f2531;
-    --ink: #e9edf5;
-    --ink-2: #aab3c4;
-    --ink-3: #7c8598;
-    --line: #2b323f;
-    --line-strong: #3b4453;
-    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 10px rgb(0 0 0 / 0.35);
-    --shadow-2: 0 10px 36px rgb(0 0 0 / 0.5);
-    --page-shadow: 0 2px 8px rgb(0 0 0 / 0.5), 0 24px 60px rgb(0 0 0 / 0.55);
-    --danger: #ff6b6b;
-    --ok: #46c98a;
-    --warn: #e0a63c;
+    --desk: #1a1815;
+    --desk-deep: #141210;
+    --surface: #221f1b;
+    --surface-sunken: #1c1a17;
+    --surface-raised: #2a2621;
+    --ink: #efe9e0;
+    --ink-2: #b5aa9c;
+    --ink-3: #8b8174;
+    --ink-4: #6d645a;
+    --line: #332e28;
+    --line-strong: #453e36;
+    --line-hair: #2a2621;
+    --paper-edge: rgb(0 0 0 / 0.5);
+    --paper-shadow:
+      0 1px 2px rgb(0 0 0 / 0.45),
+      0 8px 20px rgb(0 0 0 / 0.4),
+      0 26px 60px rgb(0 0 0 / 0.42);
+    --accent-tint: color-mix(in srgb, var(--accent) 22%, transparent);
+    --accent-tint-strong: color-mix(in srgb, var(--accent) 30%, transparent);
+    --accent-line: color-mix(in srgb, var(--accent) 58%, transparent);
+    --accent-text: color-mix(in srgb, var(--accent) 72%, #ffd9c0);
+    --danger: #e0705c;
+    --ok: #6cb37f;
+    --warn: #d9a45c;
+    --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
+    --overlay-veil: rgb(10 8 6 / 0.55);
   }
 }
 
-/* ── Workspace backgrounds ───────────────────────────────────────────── */
-:root[data-bg="plain"] { --stage-bg: var(--app-bg); --stage-layer: none; }
+/* ── Superficie del escritorio ────────────────────────────────────────── */
+/* Cuatro acabados discretos: ninguno decorativo, todos a muy bajo contraste. */
+:root[data-bg="plain"] { --desk-layer: none; --desk-layer-size: auto; }
+
 :root[data-bg="gradient"] {
-  --stage-bg: var(--app-bg);
-  --stage-layer:
-    radial-gradient(60vw 40vw at 12% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
-    radial-gradient(50vw 45vw at 92% 18%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 72%),
-    linear-gradient(160deg, var(--app-bg), var(--app-bg-2));
-}
-:root[data-bg="dots"] {
-  --stage-bg: var(--app-bg);
-  --stage-layer: radial-gradient(currentColor 1px, transparent 1px);
-  --stage-layer-size: 22px 22px;
-  --stage-layer-color: color-mix(in srgb, var(--ink) 12%, transparent);
-}
-:root[data-bg="grid"] {
-  --stage-bg: var(--app-bg);
-  --stage-layer:
-    linear-gradient(to right, color-mix(in srgb, var(--ink) 8%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 8%, transparent) 1px, transparent 1px);
-  --stage-layer-size: 28px 28px, 28px 28px;
+  /* Viñeta neutra: profundidad de mesa, no degradado de marca. */
+  --desk-layer: radial-gradient(120% 90% at 50% 0%, transparent 45%, var(--desk-deep) 100%);
+  --desk-layer-size: auto;
 }
 
-/* Transparency can be disabled by preference or by lack of support. */
-:root[data-transparency="off"] { --surface-alpha: 1; --blur: 0px; }
-@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
-  :root { --surface-alpha: 1; --blur: 0px; }
+:root[data-bg="dots"] {
+  --desk-layer: radial-gradient(currentColor 0.7px, transparent 0.7px);
+  --desk-layer-size: 20px 20px;
+  --desk-layer-ink: color-mix(in srgb, var(--ink) 13%, transparent);
+}
+
+:root[data-bg="grid"] {
+  --desk-layer:
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+  --desk-layer-size: 24px 24px, 24px 24px;
+}
+
+/* "Textura del escritorio" desactivada: superficies planas, sólo filetes. */
+:root[data-transparency="off"] {
+  --desk-layer: none;
+  --paper-shadow: 0 0 0 1px var(--paper-edge);
+  --shadow-panel: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

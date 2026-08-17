@@ -254,6 +254,21 @@ export class App {
     $('#btnSave').addEventListener('click', () => commands.save());
     $('#btnExport').addEventListener('click', () => commands.exportDialog());
     $('#btnHelp').addEventListener('click', () => commands.showShortcuts());
+
+    // El inspector se puede plegar: el documento gana toda la mesa.
+    const inspectorBtn = $('#btnInspector');
+    const syncInspector = () => {
+      const visible = this.prefs.values.inspector !== false;
+      document.body.dataset.inspector = visible ? 'on' : 'off';
+      inspectorBtn.setAttribute('aria-pressed', String(visible));
+      inspectorBtn.title = visible ? 'Ocultar inspector' : 'Mostrar inspector';
+    };
+    inspectorBtn.addEventListener('click', () => {
+      this.prefs.set({ inspector: this.prefs.values.inspector === false });
+      syncInspector();
+    });
+    this.prefs.on('change', syncInspector);
+    syncInspector();
     $('#btnAddSection').addEventListener('click', () => store.addSection());
 
     $('#btnImportImages').addEventListener('click', () => $('#fileImages').click());

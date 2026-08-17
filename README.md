@@ -88,21 +88,36 @@ Son dos cosas distintas y la interfaz las mantiene separadas:
 
 ## Interfaz
 
-* Panel izquierdo: herramientas + estructura del documento (secciones, páginas, miniaturas).
-* Centro: lienzo Carta con zoom (`Ctrl`+rueda) y ajuste automático a la ventana.
-* Panel derecho: propiedades contextuales — edita la selección o, si no hay selección,
-  los valores por defecto de la herramienta activa.
-* Barra superior: deshacer/rehacer, nuevo, abrir, guardar, exportar, imagen, zoom y apariencia.
-* Barra de estado: estado de guardado, posición en el documento y pista de la herramienta.
+Dirección visual: **papel digital sobre un escritorio editorial**. El documento manda y la
+interfaz se retira mientras se trabaja.
 
-**Apariencia**: tema claro/oscuro/sistema, color de acento (paleta o personalizado), cuatro fondos
-de área de trabajo y un interruptor para desactivar la transparencia. Todo se recuerda entre sesiones.
+* **Barra de aplicación** fina: icono y nombre del documento (en tipografía editorial), acciones
+  de proyecto, imagen e historial a la izquierda; zoom, exportar, apariencia, inspector y ayuda a
+  la derecha, separados por filetes verticales en lugar de píldoras.
+* **Índice del documento** a la izquierda: secciones y páginas con sangría, guía vertical,
+  miniaturas y un filete cobre en la página activa. Sin tarjetas.
+* **Bandeja de instrumentos** flotante junto al papel: nueve herramientas con tooltip y atajo,
+  separadas en grupos (selección · dibujo · borrado). El instrumento activo se marca con un fondo
+  cobre discreto.
+* **Mesa de trabajo**: fondo cálido con cuatro acabados (liso, viñeta, puntos, retícula) y la hoja
+  siempre blanca y neutra, con filete y sombra sutil, en ambos temas.
+* **Inspector** contextual y plegable (botón en la barra o el mismo panel): con selección muestra
+  sólo los controles pertinentes; sin selección, la apariencia de la herramienta activa. Secciones
+  separadas por espacio y filetes, no por tarjetas.
+* **Barra de estado**: guardado, posición en el documento y pista de la herramienta.
+
+**Paleta**: papel cálido (`#F3F1EC` / `#FAF9F6`) y carbón cálido en oscuro, nunca negro azulado.
+Acento **cobre quemado** (`#C66A32`) reservado a selección, estado activo y acciones importantes;
+puede cambiarse por otro de la familia tierra o uno personalizado. Los controles de selección del
+lienzo mantienen un azul de precisión, deliberadamente distinto del acento.
+
+**Geometría y movimiento**: radios de 5–9 px, sin degradados decorativos ni cristal esmerilado,
+sombras mínimas y transiciones de 120 ms que sólo explican cambios de estado (se anulan con
+`prefers-reduced-motion`).
 
 **Accesibilidad**: `:focus-visible` en todos los controles, etiquetas y `aria-*` en botones e
-iconos, navegación por teclado, respeto a `prefers-reduced-motion` y alternativa sólida cuando
-`backdrop-filter` no está disponible o la transparencia se desactiva.
-
----
+iconos, navegación por teclado y una superficie plana alternativa cuando se desactivan la textura
+y las sombras del escritorio.
 
 ## Arquitectura
 

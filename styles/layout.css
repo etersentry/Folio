@@ -1,115 +1,146 @@
-/* App shell: top bar / left panel / stage / right panel / status bar. */
+/* Composición: barra de aplicación / índice · mesa · inspector / estado.
+   Sin tarjetas: las zonas se separan con filetes y espacio. */
 
 body {
   display: grid;
-  grid-template-rows: var(--topbar-h) 1fr var(--statusbar-h);
+  grid-template-rows: var(--appbar-h) 1fr var(--statusbar-h);
   height: 100dvh;
 }
 
-.glass {
-  background: rgb(var(--surface) / var(--surface-alpha));
-  backdrop-filter: blur(var(--blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--blur)) saturate(150%);
-  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
-  box-shadow: var(--shadow-1);
-}
-
-/* ── Top bar ─────────────────────────────────────────────────────────── */
-.topbar {
+/* ── Barra de aplicación ──────────────────────────────────────────────── */
+.appbar {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--space-3);
-  border-width: 0 0 1px 0;
-  border-radius: 0;
+  gap: var(--space-2);
+  padding: 0 10px 0 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
   z-index: 30;
 }
-.topbar__group { display: flex; align-items: center; gap: 6px; }
-.topbar__group + .topbar__group { padding-left: var(--space-3); border-left: 1px solid var(--line); }
-.topbar__right { margin-left: auto; border-left: 0; }
-.topbar__brand { gap: var(--space-2); min-width: 0; }
 
-.brand-mark { display: grid; place-items: center; color: var(--accent); }
+.appbar__group { display: flex; align-items: center; gap: 1px; }
+.appbar__spacer { flex: 1; }
+.appbar__lead { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
 
-.project-name {
-  width: 190px;
-  min-width: 90px;
-  padding: 5px 8px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  text-overflow: ellipsis;
-}
-.project-name:hover { border-color: var(--line); }
-.project-name:focus { border-color: var(--accent); background: var(--surface-solid); outline: none; }
-
-.dirty-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--warn);
+/* Divisor vertical fino en lugar de encerrar cada acción. */
+.rule {
+  width: 1px;
+  height: 18px;
+  background: var(--line);
   flex: none;
 }
 
-/* ── Workspace ───────────────────────────────────────────────────────── */
-.workspace {
-  position: relative;
-  display: grid;
-  grid-template-columns: var(--panel-left-w) minmax(0, 1fr) var(--panel-right-w);
-  gap: var(--space-3);
-  padding: var(--space-3);
-  min-height: 0;
-  background: var(--stage-bg);
+.brand { display: grid; place-items: center; color: var(--ink-2); }
+.brand__band { color: var(--accent); }
+
+.doc-name {
+  width: 210px;
+  min-width: 90px;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--r-control);
+  background: transparent;
+  font-family: var(--font-editorial);
+  font-size: 14px;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  transition: border-color var(--motion) var(--ease), background var(--motion) var(--ease);
 }
-.workspace::before {
+.doc-name:hover { border-color: var(--line); }
+.doc-name:focus {
+  border-color: var(--accent-line);
+  background: var(--surface-raised);
+  outline: none;
+}
+
+.dirty-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+
+.zoom { display: flex; align-items: center; gap: 0; }
+.zoom__value {
+  min-width: 46px;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+/* ── Espacio de trabajo ───────────────────────────────────────────────── */
+.workspace {
+  display: grid;
+  grid-template-columns: var(--index-w) minmax(0, 1fr) var(--inspector-w);
+  min-height: 0;
+  background: var(--desk);
+}
+
+body[data-inspector="off"] .workspace {
+  grid-template-columns: var(--index-w) minmax(0, 1fr);
+}
+body[data-inspector="off"] .inspector { display: none; }
+
+/* ── Índice del documento ─────────────────────────────────────────────── */
+.index {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+}
+.index__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 12px 12px 8px;
+}
+.index__title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+/* ── Mesa de trabajo ──────────────────────────────────────────────────── */
+.stage-area {
+  position: relative;
+  min-width: 0;
+  /* min-height: 0 lets the stage scroll instead of stretching the workspace. */
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  background: var(--desk);
+}
+.stage-area::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: var(--stage-layer, none);
-  background-size: var(--stage-layer-size, auto);
-  color: var(--stage-layer-color, transparent);
-  z-index: 0;
+  background-image: var(--desk-layer, none);
+  background-size: var(--desk-layer-size, auto);
+  color: var(--desk-layer-ink, transparent);
 }
 
-.panel {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  border-radius: var(--radius-lg);
-  min-height: 0;
-  overflow: hidden;
-}
-.panel__block { display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; }
-.panel__block--grow { flex: 1; min-height: 0; }
-.panel__title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.panel__title-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
-
-/* ── Stage ───────────────────────────────────────────────────────────── */
-.stage-area { position: relative; z-index: 1; min-width: 0; display: flex; }
 .stage {
+  position: relative;
   flex: 1;
+  min-height: 0;
   overflow: auto;
-  padding: var(--space-4);
   display: grid;
   place-items: start center;
-  border-radius: var(--radius-lg);
+  padding: 28px 28px 34px calc(var(--rail-w) + 34px);
+  scrollbar-gutter: stable;
 }
+
+/* El papel: blanco neutro en ambos temas, filete y sombra realista. */
 .page-shell {
   position: relative;
-  background: #fff;
-  border-radius: 3px;
-  box-shadow: var(--page-shadow);
+  background: var(--paper);
+  border-radius: var(--r-paper);
+  box-shadow: 0 0 0 1px var(--paper-edge), var(--paper-shadow);
   transform-origin: top center;
 }
 .page-canvas, .overlay-canvas {
@@ -118,7 +149,7 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
-  border-radius: 3px;
+  border-radius: var(--r-paper);
 }
 .page-canvas { z-index: 1; }
 .overlay-canvas { z-index: 2; touch-action: none; }
@@ -132,48 +163,87 @@ body {
   resize: none;
   overflow: hidden;
   background: transparent;
-  outline: 1px dashed var(--accent);
+  outline: 1px dashed var(--marquee);
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* Bandeja de instrumentos junto al documento. */
+.toolrail {
+  position: absolute;
+  left: 14px;
+  top: 26px;
+  z-index: 5;
+  max-height: calc(100% - 52px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  box-shadow: var(--shadow-panel);
 }
 
 .stage-hint {
   position: absolute;
   left: 50%;
-  bottom: 14px;
+  bottom: 10px;
   transform: translateX(-50%);
-  padding: 7px 14px;
-  border-radius: 999px;
-  color: var(--ink-2);
-  font-size: 12px;
+  z-index: 4;
+  font-size: 11.5px;
+  color: var(--ink-3);
   pointer-events: none;
-  transition: opacity var(--motion) ease;
+  white-space: nowrap;
 }
 .stage-hint[hidden] { display: none; }
+.stage-hint b { color: var(--ink-2); font-weight: 600; }
 
-/* ── Status bar ──────────────────────────────────────────────────────── */
+/* ── Inspector ────────────────────────────────────────────────────────── */
+.inspector {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+}
+.inspector__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 12px 14px 8px;
+}
+.inspector__title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.005em;
+}
+
+/* ── Barra de estado ──────────────────────────────────────────────────── */
 .statusbar {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--space-4);
-  border-width: 1px 0 0 0;
-  border-radius: 0;
-  font-size: 11.5px;
-  color: var(--ink-2);
+  padding: 0 12px;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--ink-3);
   z-index: 30;
 }
 .status-spacer { flex: 1; }
-.status-sep { color: var(--ink-3); }
-.status-item--muted { color: var(--ink-3); }
+.status-sep { width: 1px; height: 10px; background: var(--line); }
+.status-item--muted { color: var(--ink-4); }
 .status-item.is-error { color: var(--danger); font-weight: 600; }
-.status-item.is-ok { color: var(--ok); }
+.status-item.is-ok { color: var(--ink-2); }
 
-/* ── Narrow windows ──────────────────────────────────────────────────── */
-@media (max-width: 1180px) {
-  :root { --panel-left-w: 226px; --panel-right-w: 240px; }
+/* ── Ventanas estrechas ───────────────────────────────────────────────── */
+@media (max-width: 1220px) {
+  :root { --index-w: 208px; --inspector-w: 262px; }
 }
-@media (max-width: 940px) {
-  .workspace { grid-template-columns: 200px minmax(0, 1fr); }
-  .panel--right { display: none; }
+@media (max-width: 980px) {
+  .workspace,
+  body[data-inspector="off"] .workspace { grid-template-columns: 188px minmax(0, 1fr); }
+  .inspector { display: none; }
 }

@@ -5,7 +5,7 @@ export default [
       ecmaVersion: 2023,
       sourceType: 'module',
       globals: {
-        window:'readonly', document:'readonly', navigator:'readonly', console:'readonly',
+        window:'readonly', getComputedStyle:'readonly', document:'readonly', navigator:'readonly', console:'readonly',
         setTimeout:'readonly', clearTimeout:'readonly', requestAnimationFrame:'readonly',
         Blob:'readonly', File:'readonly', FileReader:'readonly', URL:'readonly', Image:'readonly',
         fetch:'readonly', Response:'readonly', indexedDB:'readonly', IDBRequest:'readonly',

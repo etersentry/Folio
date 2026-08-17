@@ -8,6 +8,14 @@ import { renderPage } from './renderer.js';
 const MAX_RENDER_SCALE = 3;
 
 /**
+ * Selection chrome uses a precise blue on purpose: it must never be confused
+ * with a copper annotation, and it stays legible over any screenshot.
+ */
+const MARQUEE = '#2f6df0';
+const MARQUEE_SOFT = 'rgba(47,109,240,0.5)';
+const MARQUEE_FILL = 'rgba(47,109,240,0.10)';
+
+/**
  * Owns the two stacked canvases: the page (content) and the overlay
  * (selection, handles, marquee, eraser cursor), plus the viewport transform.
  */
@@ -75,9 +83,13 @@ export class PageView extends Emitter {
   }
 
   zoomToFit() {
-    const padding = 32;
-    const availableH = this.#stage.clientHeight - padding * 2;
-    const availableW = this.#stage.clientWidth - padding * 2;
+    // Measure the real content box: the stage padding is part of the layout
+    // (it leaves room for the instrument tray) and changes with the theme.
+    const style = getComputedStyle(this.#stage);
+    const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    const availableW = this.#stage.clientWidth - padX;
+    const availableH = this.#stage.clientHeight - padY;
     if (availableH <= 0 || availableW <= 0) return;
     const zoom = Math.min(availableW / PAGE.width, availableH / PAGE.height);
     this.setZoom(clamp(zoom, 0.1, 2), { fit: true });
@@ -105,8 +117,10 @@ export class PageView extends Emitter {
       canvas.height = Math.max(1, Math.round(PAGE.height * scale));
     }
     this.#renderScale = scale;
-    this.renderPage();
-    this.renderOverlay();
+    // Resizing a canvas clears it: repaint synchronously so a zoom change can
+    // never expose an empty backing store.
+    this.#paintPage();
+    this.#paintOverlay();
   }
 
   /** Client (mouse) coordinates → document coordinates. */
@@ -163,7 +177,7 @@ export class PageView extends Emitter {
       if (obj && !this.#store.isSelected(obj.id)) {
         const b = boundsOf(obj);
         ctx.save();
-        ctx.strokeStyle = 'rgba(79,124,255,0.55)';
+        ctx.strokeStyle = MARQUEE_SOFT;
         ctx.lineWidth = px;
         ctx.strokeRect(b.x - px, b.y - px, b.w + px * 2, b.h + px * 2);
         ctx.restore();
@@ -173,7 +187,7 @@ export class PageView extends Emitter {
     for (const obj of selected) {
       const b = boundsOf(obj);
       ctx.save();
-      ctx.strokeStyle = '#4f7cff';
+      ctx.strokeStyle = MARQUEE;
       ctx.lineWidth = px * 1.4;
       ctx.setLineDash([5 * px, 4 * px]);
       if (isSegment(obj)) {
@@ -191,7 +205,7 @@ export class PageView extends Emitter {
       const size = HANDLE_SIZE / zoom;
       ctx.save();
       ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#4f7cff';
+      ctx.strokeStyle = MARQUEE;
       ctx.lineWidth = px * 1.4;
       for (const handle of handlesOf(selected[0])) {
         ctx.beginPath();
@@ -205,8 +219,8 @@ export class PageView extends Emitter {
     if (this.#overlay.marquee) {
       const m = this.#overlay.marquee;
       ctx.save();
-      ctx.fillStyle = 'rgba(79,124,255,0.12)';
-      ctx.strokeStyle = '#4f7cff';
+      ctx.fillStyle = MARQUEE_FILL;
+      ctx.strokeStyle = MARQUEE;
       ctx.lineWidth = px;
       ctx.fillRect(m.x, m.y, m.w, m.h);
       ctx.strokeRect(m.x, m.y, m.w, m.h);
