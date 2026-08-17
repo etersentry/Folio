@@ -8,25 +8,26 @@ const THEMES = [
 ];
 
 /** Floating appearance panel: theme, accent, workspace background, glass. */
-export function mountAppearance({ button, prefs }) {
+export function mountAppearance({ button = null, prefs }) {
   let popover = null;
+  let anchor = button;
 
   const close = () => {
     popover?.remove();
     popover = null;
-    button.setAttribute('aria-expanded', 'false');
+    anchor?.setAttribute?.('aria-expanded', 'false');
     document.removeEventListener('pointerdown', onOutside, true);
     document.removeEventListener('keydown', onKey, true);
   };
 
   const onOutside = (event) => {
     if (!popover) return;
-    if (popover.contains(event.target) || button.contains(event.target)) return;
+    if (popover.contains(event.target) || anchor?.contains(event.target)) return;
     close();
   };
 
   const onKey = (event) => {
-    if (event.key === 'Escape') { event.stopPropagation(); close(); button.focus(); }
+    if (event.key === 'Escape') { event.stopPropagation(); close(); anchor?.focus?.(); }
   };
 
   const optionRow = (label, options, current, onPick, { columns = 3 } = {}) => el('div.field', {}, [
@@ -76,7 +77,7 @@ export function mountAppearance({ button, prefs }) {
   }
 
   function place() {
-    const rect = button.getBoundingClientRect();
+    const rect = anchor.getBoundingClientRect();
     popover.style.top = `${rect.bottom + 8}px`;
     popover.style.left = `${Math.max(12, Math.min(rect.right - 268, window.innerWidth - 280))}px`;
   }
@@ -88,17 +89,18 @@ export function mountAppearance({ button, prefs }) {
     popover.append(...next.childNodes);
   }
 
-  function open() {
+  function open(nextAnchor = anchor) {
+    anchor = nextAnchor;
     popover = build();
     document.body.append(popover);
     place();
-    button.setAttribute('aria-expanded', 'true');
+    anchor?.setAttribute?.('aria-expanded', 'true');
     document.addEventListener('pointerdown', onOutside, true);
     document.addEventListener('keydown', onKey, true);
     popover.querySelector('button')?.focus();
   }
 
-  button.addEventListener('click', () => (popover ? close() : open()));
+  if (button) button.addEventListener('click', () => (popover ? close() : open(button)));
   window.addEventListener('resize', () => popover && place());
-  return { close };
+  return { open, close, toggle: (el) => (popover ? close() : open(el)) };
 }

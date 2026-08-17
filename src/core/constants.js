@@ -48,12 +48,12 @@ export const PALETTE = Object.freeze([
 
 /** Acentos de la interfaz: familia cobre/tierra, con una alternativa fría. */
 export const ACCENTS = Object.freeze([
+  { id: 'bermellón', value: '#d94b38' },
+  { id: 'granate', value: '#9e2f2b' },
   { id: 'cobre', value: '#c66a32' },
-  { id: 'ladrillo', value: '#a8453a' },
-  { id: 'ocre', value: '#b3862b' },
-  { id: 'oliva', value: '#6b7f3a' },
-  { id: 'pizarra', value: '#4a6572' },
-  { id: 'ciruela', value: '#7d4a63' },
+  { id: 'tinta', value: '#2f3a44' },
+  { id: 'oliva', value: '#5f7040' },
+  { id: 'ciruela', value: '#75405c' },
 ]);
 
 /** Acabados de la mesa de trabajo (los identificadores se conservan). */

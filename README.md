@@ -88,36 +88,43 @@ Son dos cosas distintas y la interfaz las mantiene separadas:
 
 ## Interfaz
 
-Dirección visual: **papel digital sobre un escritorio editorial**. El documento manda y la
-interfaz se retira mientras se trabaja.
+**El documento ocupa la aplicación.** No hay paneles laterales permanentes: todo lo que no es
+papel flota, se agrupa abajo o se despliega sólo cuando hace falta.
 
-* **Barra de aplicación** fina: icono y nombre del documento (en tipografía editorial), acciones
-  de proyecto, imagen e historial a la izquierda; zoom, exportar, apariencia, inspector y ayuda a
-  la derecha, separados por filetes verticales en lugar de píldoras.
-* **Índice del documento** a la izquierda: secciones y páginas con sangría, guía vertical,
-  miniaturas y un filete cobre en la página activa. Sin tarjetas.
-* **Bandeja de instrumentos** flotante junto al papel: nueve herramientas con tooltip y atajo,
-  separadas en grupos (selección · dibujo · borrado). El instrumento activo se marca con un fondo
-  cobre discreto.
-* **Mesa de trabajo**: fondo cálido con cuatro acabados (liso, viñeta, puntos, retícula) y la hoja
-  siempre blanca y neutra, con filete y sombra sutil, en ambos temas.
-* **Inspector** contextual y plegable (botón en la barra o el mismo panel): con selección muestra
-  sólo los controles pertinentes; sin selección, la apariencia de la herramienta activa. Secciones
-  separadas por espacio y filetes, no por tarjetas.
-* **Barra de estado**: guardado, posición en el documento y pista de la herramienta.
+* **Barra superior** (40 px): marca, nombre editable del documento, `Nuevo · Abrir · Guardar`,
+  **Exportar** y un menú `···` con *Guardar como…*, *Apariencia* y *Atajos*. Nada más.
+* **Bandeja de instrumentos**: una columna vertical sin panel detrás, pegada al costado del papel
+  (sigue a la hoja al hacer zoom). Nueve herramientas, separador y el botón de insertar imagen.
+* **Barra contextual flotante**: aparece sobre la selección con lo justo — tamaño, negrita,
+  alineación y color para texto; grosor y color para formas; opacidad y banda para marcador y
+  resaltador; marco y ajuste para imágenes; además duplicar y eliminar. Sin selección refleja la
+  herramienta activa; con la herramienta de selección desaparece.
+* **Drawer** (`···` → *Propiedades avanzadas*, o **Documento**): panel efímero a la derecha con el
+  inspector completo (orden de capas, posición y tamaño, borde, fondo, alineación…) y el navegador
+  del documento (renombrar, duplicar, eliminar, contraer y reordenar secciones y páginas). Se
+  superpone: el papel nunca cambia de tamaño ni de sitio.
+* **Tira de páginas** abajo: miniaturas agrupadas por sección, con flechas de desplazamiento y
+  `+ página`. Arrastrar una miniatura reordena, también entre secciones.
+* **Zoom** e **historial** viven junto al documento, en las esquinas inferiores del escritorio.
+* **Línea de estado**: guardado, posición en el documento y pista de la herramienta.
 
-**Paleta**: papel cálido (`#F3F1EC` / `#FAF9F6`) y carbón cálido en oscuro, nunca negro azulado.
-Acento **cobre quemado** (`#C66A32`) reservado a selección, estado activo y acciones importantes;
-puede cambiarse por otro de la familia tierra o uno personalizado. Los controles de selección del
-lienzo mantienen un azul de precisión, deliberadamente distinto del acento.
+### Identidad
 
-**Geometría y movimiento**: radios de 5–9 px, sin degradados decorativos ni cristal esmerilado,
-sombras mínimas y transiciones de 120 ms que sólo explican cambios de estado (se anulan con
-`prefers-reduced-motion`).
+Tinta editorial: papel `#F5F3EE`, tinta `#181817` y un **bermellón `#D94B38`** reservado a lo
+importante. El modo oscuro es carbón neutro, nunca marrón ni azulado, y la hoja sigue siendo
+blanca y neutra.
 
-**Accesibilidad**: `:focus-visible` en todos los controles, etiquetas y `aria-*` en botones e
-iconos, navegación por teclado y una superficie plana alternativa cuando se desactivan la textura
-y las sombras del escritorio.
+El rasgo reconocible es una **línea vertical roja fina**, repetida como marca de estado: en el
+logotipo, en el instrumento activo, en la página activa de la tira, en la sección, en el índice,
+en el título del drawer, en los diálogos y en la entrada enfocada de un menú.
+
+Sin cristal esmerilado, sin degradados decorativos, casi sin píldoras ni contenedores: filete,
+tipografía, icono y espacio. Radios de 4–6 px y transiciones de 110 ms que sólo explican cambios
+de estado (anuladas con `prefers-reduced-motion`).
+
+**Accesibilidad**: `:focus-visible` en todos los controles, etiquetas y `aria-*`, navegación por
+teclado en menús y drawer (Escape cierra), y una superficie plana alternativa cuando se desactivan
+la textura y las sombras del escritorio.
 
 ## Arquitectura
 
@@ -130,13 +137,14 @@ src/
   core/        emitter · util · dom · constants · geometry     (sin estado de app)
   document/    model · store · history · assets                (estado del documento)
   canvas/      renderer · shapes · pageView · interactions · textEditor
-  tools/       registry · toolState                            (herramientas y apariencia)
+  tools/       registry · toolState · styleBridge             (herramientas y apariencia)
   import/      images                                          (pegado, archivos, auto-acomodo)
   export/      exporter · pdf                                  (PDF/PNG/JPG)
   storage/     db · serialize · projects · fileAccess          (IndexedDB, autoguardado, .folio)
   prefs/       preferences                                     (tema, acento, fondo)
-  ui/          toolPanel · outline · properties · appearance · shortcuts ·
-               thumbnails · exportDialog · dialogs · modal · toasts
+  ui/          toolPanel · quickbar · filmstrip · drawer · menu · outline ·
+               properties · appearance · shortcuts · thumbnails ·
+               exportDialog · dialogs · modal · toasts
   app.js       controlador: cablea servicios, comandos y UI
   main.js      arranque
 ```
@@ -151,6 +159,9 @@ Reglas que sostienen la separación:
   gesto y **una sola** entrada de historial al soltar.
 * El mismo renderizador (`canvas/renderer.js`) dibuja la pantalla, las miniaturas y las
   exportaciones, de modo que lo exportado es exactamente lo que se ve.
+* `tools/styleBridge.js` es el único sitio que traduce una propiedad de apariencia a un cambio en
+  el objeto: la barra contextual y el inspector del drawer comparten esa lógica, así que editar
+  desde cualquiera de los dos produce exactamente el mismo documento y el mismo historial.
 
 ## Alcance
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Folio — Anotación y composición de documentos</title>
 <meta name="description" content="Herramienta local-first para anotar capturas y componer documentos." />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F3F1EC'/><rect x='8' y='6' width='16' height='20' fill='white' stroke='%23221F1B' stroke-width='1.4'/><path d='M8 6h16v4H8z' fill='%23C66A32'/></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23F5F3EE'/><rect x='9' y='5' width='15' height='22' fill='white' stroke='%23181817' stroke-width='1.5'/><rect x='12' y='5' width='2' height='22' fill='%23D94B38'/></svg>" />
 <link rel="stylesheet" href="./styles/tokens.css" />
 <link rel="stylesheet" href="./styles/base.css" />
 <link rel="stylesheet" href="./styles/layout.css" />
@@ -14,129 +14,123 @@
 <body>
 <a class="skip-link" href="#stage">Saltar al lienzo</a>
 
-<!-- ───────────────────────────── Barra de aplicación ───────────────────── -->
-<header class="appbar" role="banner">
-  <div class="appbar__lead">
-    <span class="brand" aria-hidden="true">
-      <svg viewBox="0 0 20 20" width="17" height="17">
-        <rect x="3.5" y="2.5" width="13" height="15" fill="none" stroke="currentColor" stroke-width="1.3"/>
-        <path d="M3.5 2.5h13v3.2h-13z" fill="currentColor" class="brand__band"/>
-        <path d="M6.4 9.4h7.2M6.4 12.2h4.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-    </span>
-    <label class="visually-hidden" for="projectName">Nombre del proyecto</label>
-    <input id="projectName" class="doc-name" type="text" value="Proyecto sin título" spellcheck="false" autocomplete="off" />
-    <span id="dirtyDot" class="dirty-dot" title="Cambios sin guardar" hidden></span>
-  </div>
+<!-- ── Barra superior: identidad, archivo, exportar. Nada más. ─────────── -->
+<header class="topbar" role="banner">
+  <span class="mark" aria-hidden="true">
+    <svg viewBox="0 0 18 20" width="16" height="18">
+      <rect x="2.5" y="1.5" width="13" height="17" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <rect x="5.6" y="1.5" width="1.8" height="17" class="mark__spine"/>
+    </svg>
+  </span>
+  <span class="topbar__name">Folio</span>
+  <span class="hair" aria-hidden="true"></span>
+  <label class="visually-hidden" for="projectName">Nombre del proyecto</label>
+  <input id="projectName" class="doc-name" type="text" value="Proyecto sin título" spellcheck="false" autocomplete="off" />
+  <span id="dirtyDot" class="dirty-dot" title="Cambios sin guardar" hidden></span>
 
-  <span class="rule" aria-hidden="true"></span>
+  <span class="topbar__spacer"></span>
 
-  <div class="appbar__group" role="group" aria-label="Proyecto">
-    <button class="btn btn--flat" id="btnNew">Nuevo</button>
-    <button class="btn btn--flat" id="btnOpen">Abrir</button>
-    <button class="btn btn--flat" id="btnSave">Guardar</button>
-  </div>
-
-  <span class="rule" aria-hidden="true"></span>
-
-  <div class="appbar__group" role="group" aria-label="Imágenes">
-    <button class="btn btn--flat" id="btnImportImages">
-      <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none">
-        <rect x="3.5" y="5.5" width="17" height="13" stroke="currentColor" stroke-width="1.4"/>
-        <circle cx="8.6" cy="10" r="1.3" fill="currentColor"/>
-        <path d="m4 16.5 4.6-4.6 3.6 3.6 2.8-1.9 5 4.4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-      </svg>
-      Imagen
-    </button>
-    <input type="file" id="fileImages" accept="image/*" multiple hidden />
-    <input type="file" id="fileProject" accept=".folio,.json,application/json" hidden />
-  </div>
-
-  <span class="rule" aria-hidden="true"></span>
-
-  <div class="appbar__group" role="group" aria-label="Historial">
-    <button class="btn btn--flat btn--icon" id="btnUndo" title="Deshacer (Ctrl+Z)" aria-label="Deshacer" disabled>
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none"><path d="M8.5 7.5 4.5 11.5l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 11.5h9a5 5 0 0 1 0 10h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    </button>
-    <button class="btn btn--flat btn--icon" id="btnRedo" title="Rehacer (Ctrl+Y)" aria-label="Rehacer" disabled>
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none"><path d="m15.5 7.5 4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.5 11.5h-9a5 5 0 0 0 0 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    </button>
-  </div>
-
-  <div class="appbar__spacer"></div>
-
-  <div class="zoom" role="group" aria-label="Zoom">
-    <button class="btn btn--flat btn--icon" id="btnZoomOut" aria-label="Alejar">−</button>
-    <button class="btn btn--flat zoom__value" id="btnZoomFit" title="Ajustar a la ventana">100%</button>
-    <button class="btn btn--flat btn--icon" id="btnZoomIn" aria-label="Acercar">+</button>
-  </div>
-
-  <span class="rule" aria-hidden="true"></span>
-
+  <button class="link" id="btnNew">Nuevo</button>
+  <button class="link" id="btnOpen">Abrir</button>
+  <button class="link" id="btnSave">Guardar</button>
   <button class="btn btn--accent" id="btnExport">Exportar</button>
-
-  <span class="rule" aria-hidden="true"></span>
-
-  <div class="appbar__group" role="group" aria-label="Vista">
-    <button class="btn btn--flat btn--icon" id="btnInspector" title="Inspector" aria-label="Mostrar u ocultar el inspector" aria-pressed="true">
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none"><rect x="3.5" y="5" width="17" height="14" stroke="currentColor" stroke-width="1.4"/><path d="M15 5v14" stroke="currentColor" stroke-width="1.4"/></svg>
-    </button>
-    <button class="btn btn--flat btn--icon" id="btnAppearance" title="Apariencia" aria-label="Apariencia" aria-haspopup="dialog" aria-expanded="false">
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none"><circle cx="12" cy="12" r="7.6" stroke="currentColor" stroke-width="1.4"/><path d="M12 4.4a7.6 7.6 0 0 1 0 15.2Z" fill="currentColor"/></svg>
-    </button>
-    <button class="btn btn--flat btn--icon" id="btnHelp" title="Atajos de teclado" aria-label="Atajos de teclado">
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/><path d="M9.7 9.5a2.4 2.4 0 1 1 3.2 2.3c-.6.2-.9.7-.9 1.3v.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="16.3" r=".95" fill="currentColor"/></svg>
-    </button>
-  </div>
+  <button class="btn btn--icon btn--flat" id="btnMore" title="Más opciones" aria-label="Más opciones" aria-haspopup="menu" aria-expanded="false">
+    <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="4" cy="10" r="1.5" fill="currentColor"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/><circle cx="16" cy="10" r="1.5" fill="currentColor"/></svg>
+  </button>
+  <input type="file" id="fileImages" accept="image/*" multiple hidden />
+  <input type="file" id="fileProject" accept=".folio,.json,application/json" hidden />
 </header>
 
-<!-- ───────────────────────────── Espacio de trabajo ────────────────────── -->
-<main class="workspace" id="workspace">
-  <!-- Índice del documento -->
-  <aside class="index" aria-label="Secciones y páginas">
-    <div class="index__head">
-      <h2 class="index__title">Documento</h2>
-      <button class="btn btn--flat btn--mini" id="btnAddSection" title="Nueva sección">Sección +</button>
-    </div>
-    <div class="outline" id="outline" role="tree" aria-label="Secciones y páginas"></div>
-  </aside>
+<!-- ── Escritorio: sólo el papel y los instrumentos ────────────────────── -->
+<main class="desk" id="desk">
+  <div class="rail" role="toolbar" aria-label="Instrumentos">
+    <div class="tool-grid" id="toolGrid" aria-label="Herramientas de anotación"></div>
+    <span class="rail__hair" aria-hidden="true"></span>
+    <button class="tool" id="btnImportImages" title="Insertar imagen (Ctrl+V)" aria-label="Insertar imagen">
+      <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" fill="none">
+        <rect x="3.5" y="5.5" width="17" height="13" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="8.6" cy="10" r="1.3" fill="currentColor"/>
+        <path d="m4 16.5 4.6-4.6 3.6 3.6 2.8-1.9 5 4.4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
 
-  <!-- Mesa de trabajo -->
-  <section class="stage-area">
-    <div class="toolrail" role="group" aria-label="Instrumentos">
-      <div class="tool-grid" id="toolGrid" role="toolbar" aria-label="Herramientas de anotación"></div>
+  <div class="stage" id="stage" tabindex="-1">
+    <div class="page-shell" id="pageShell">
+      <canvas id="pageCanvas" class="page-canvas"></canvas>
+      <canvas id="overlayCanvas" class="overlay-canvas" aria-label="Lienzo de la página" role="img"></canvas>
+      <textarea id="textEditor" class="text-editor" spellcheck="false" hidden aria-label="Editor de texto"></textarea>
     </div>
+  </div>
 
-    <div class="stage" id="stage" tabindex="-1">
-      <div class="page-shell" id="pageShell">
-        <canvas id="pageCanvas" class="page-canvas"></canvas>
-        <canvas id="overlayCanvas" class="overlay-canvas" aria-label="Lienzo de la página" role="img"></canvas>
-        <textarea id="textEditor" class="text-editor" spellcheck="false" hidden aria-label="Editor de texto"></textarea>
-      </div>
-    </div>
+  <p class="stage-hint" id="stageHint">
+    Pega una captura con <kbd>Ctrl</kbd><kbd>V</kbd>, arrástrala aquí o usa el instrumento de imagen
+  </p>
 
-    <p class="stage-hint" id="stageHint">
-      Pega una captura con <kbd>Ctrl</kbd><kbd>V</kbd>, arrástrala aquí o usa <b>Imagen</b>
-    </p>
-  </section>
+  <!-- Barra contextual flotante (aparece con la selección o la herramienta) -->
+  <div class="quickbar" id="quickbar" role="toolbar" aria-label="Propiedades rápidas" hidden></div>
 
-  <!-- Inspector -->
-  <aside class="inspector" id="inspector" aria-label="Propiedades">
-    <div class="inspector__head">
-      <h2 class="inspector__title" id="propsTitle">Propiedades</h2>
-      <span class="chip" id="propsScope">Herramienta</span>
-    </div>
-    <div class="props" id="props"></div>
-  </aside>
+  <!-- Historial y zoom, junto al documento -->
+  <div class="deskctl deskctl--left" role="group" aria-label="Historial">
+    <button class="ctl" id="btnUndo" title="Deshacer (Ctrl+Z)" aria-label="Deshacer" disabled>
+      <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none"><path d="M8.5 7.5 4.5 11.5l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 11.5h9a5 5 0 0 1 0 10h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+    <button class="ctl" id="btnRedo" title="Rehacer (Ctrl+Y)" aria-label="Rehacer" disabled>
+      <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none"><path d="m15.5 7.5 4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.5 11.5h-9a5 5 0 0 0 0 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="deskctl deskctl--right" role="group" aria-label="Zoom">
+    <button class="ctl" id="btnZoomOut" aria-label="Alejar">−</button>
+    <button class="ctl ctl--value" id="btnZoomFit" title="Ajustar a la ventana">100%</button>
+    <button class="ctl" id="btnZoomIn" aria-label="Acercar">+</button>
+  </div>
 </main>
 
-<footer class="statusbar">
+<!-- ── Tira de páginas ─────────────────────────────────────────────────── -->
+<footer class="dock">
+  <button class="link link--doc" id="btnDocument" title="Navegador del documento">Documento</button>
+  <span class="hair" aria-hidden="true"></span>
+  <button class="strip__nav" id="stripPrev" aria-label="Desplazar páginas a la izquierda">‹</button>
+  <div class="strip" id="strip" role="tablist" aria-label="Páginas"></div>
+  <button class="strip__nav" id="stripNext" aria-label="Desplazar páginas a la derecha">›</button>
+  <span class="hair" aria-hidden="true"></span>
+  <button class="link" id="btnAddPage">+ página</button>
+</footer>
+
+<div class="statusline">
   <span id="statusSave" class="status-item">Listo</span>
-  <span class="status-sep" aria-hidden="true"></span>
+  <span class="status-dot" aria-hidden="true"></span>
   <span id="statusDoc" class="status-item"></span>
   <span class="status-spacer"></span>
   <span id="statusHint" class="status-item status-item--muted"></span>
-</footer>
+</div>
+
+<!-- ── Drawer: opciones avanzadas y navegador del documento ────────────── -->
+<aside class="drawer" id="drawer" aria-label="Panel lateral" hidden>
+  <header class="drawer__head">
+    <h2 class="drawer__title" id="drawerTitle">Propiedades</h2>
+    <button class="btn btn--icon btn--flat" id="drawerClose" aria-label="Cerrar panel">
+      <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true" fill="none"><path d="m5.5 5.5 9 9M14.5 5.5l-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </header>
+
+  <section class="drawer__pane" id="paneProps" hidden>
+    <div class="drawer__subhead">
+      <span class="drawer__subtitle" id="propsTitle">Propiedades</span>
+      <span class="chip" id="propsScope">Herramienta</span>
+    </div>
+    <div class="props" id="props"></div>
+  </section>
+
+  <section class="drawer__pane" id="paneDoc" hidden>
+    <div class="drawer__subhead">
+      <span class="drawer__subtitle">Secciones y páginas</span>
+      <button class="link" id="btnAddSection" title="Nueva sección">+ sección</button>
+    </div>
+    <div class="outline" id="outline" role="tree" aria-label="Secciones y páginas"></div>
+  </section>
+</aside>
 
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 <div class="modal-root" id="modalRoot" hidden></div>

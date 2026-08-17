@@ -1,184 +1,167 @@
-/* Folio — sistema visual "papel sobre escritorio".
-   Toda la interfaz se expresa con estas variables: ninguna capa superior
-   codifica un color directamente. */
+/* Folio — identidad de tinta editorial.
+   Papel, tinta y una línea roja fina como recurso repetido de marca. */
 
 :root {
-  /* Acento cobre quemado. Lo sobrescribe la preferencia del usuario. */
-  --accent: #c66a32;
+  --accent: #d94b38;          /* bermellón: página, sección, selección */
   --accent-ink: #ffffff;
 
-  /* Geometría precisa: radios pequeños, nada de 999px como patrón. */
-  --r-control: 5px;
-  --r-panel: 9px;
-  --r-paper: 2px;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 18px;
-  --space-5: 26px;
+  --r-control: 4px;
+  --r-panel: 6px;
+  --r-paper: 1px;
 
   --font-ui: Inter, "Geist Sans", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-editorial: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino,
     Georgia, "Times New Roman", serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
-  --appbar-h: 46px;
-  --statusbar-h: 26px;
-  --index-w: 238px;
-  --inspector-w: 292px;
-  --rail-w: 40px;
+  --topbar-h: 40px;
+  --dock-h: 62px;
+  --status-h: 20px;
+  --rail-w: 34px;
 
-  /* Transiciones sólo para explicar cambios de estado. */
-  --motion: 120ms;
+  --motion: 110ms;
   --ease: cubic-bezier(0.2, 0, 0.2, 1);
 
-  /* Azul de precisión para los controles de selección sobre el lienzo:
-     deliberadamente distinto del cobre de la interfaz. */
+  /* Azul de precisión del lienzo: nunca se confunde con la tinta roja. */
   --marquee: #2f6df0;
+
+  /* Grosor de la línea vertical que marca lo activo. */
+  --spine: 2px;
 }
 
-/* ── Tema claro: papel cálido ─────────────────────────────────────────── */
+/* ── Claro: papel #F5F3EE, tinta #181817 ──────────────────────────────── */
 :root,
 :root[data-theme="light"] {
   color-scheme: light;
 
-  --desk: #efebe3;
-  --desk-deep: #e4dfd4;
-  --surface: #faf9f6;
-  --surface-sunken: #f0ede6;
+  --desk: #f5f3ee;
+  --desk-deep: #e8e5dd;
+  --surface: #fbfaf7;
+  --surface-sunken: #efece5;
   --surface-raised: #ffffff;
 
-  --ink: #221f1b;
-  --ink-2: #5f5850;
-  --ink-3: #8d857a;
-  --ink-4: #a9a196;
+  --ink: #181817;
+  --ink-2: #56544f;
+  --ink-3: #85817a;
+  --ink-4: #a5a099;
 
-  --line: #e3dfd7;
-  --line-strong: #cfc9be;
-  --line-hair: #edeae3;
+  --line: #ddd9d0;
+  --line-strong: #c6c1b7;
+  --line-hair: #eae7df;
 
   --paper: #ffffff;
-  --paper-edge: rgb(34 31 27 / 0.10);
+  --paper-edge: rgb(24 24 23 / 0.12);
   --paper-shadow:
-    0 1px 1px rgb(34 31 27 / 0.05),
-    0 4px 10px rgb(34 31 27 / 0.05),
-    0 14px 34px rgb(34 31 27 / 0.06);
+    0 1px 1px rgb(24 24 23 / 0.04),
+    0 6px 16px rgb(24 24 23 / 0.06),
+    0 18px 40px rgb(24 24 23 / 0.05);
 
   --accent-tint: color-mix(in srgb, var(--accent) 9%, transparent);
-  --accent-tint-strong: color-mix(in srgb, var(--accent) 15%, transparent);
-  --accent-line: color-mix(in srgb, var(--accent) 42%, transparent);
-  --accent-text: color-mix(in srgb, var(--accent) 88%, #2b1b10);
+  --accent-tint-strong: color-mix(in srgb, var(--accent) 16%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 40%, transparent);
+  --accent-text: color-mix(in srgb, var(--accent) 84%, #2a0e08);
 
-  --danger: #b53a2c;
+  --danger: #b5342a;
   --ok: #3f7d4f;
   --warn: #a8722a;
 
-  --shadow-panel: 0 1px 2px rgb(34 31 27 / 0.05), 0 6px 18px rgb(34 31 27 / 0.07);
-  --overlay-veil: rgb(34 31 27 / 0.28);
+  --float-shadow: 0 1px 2px rgb(24 24 23 / 0.06), 0 8px 22px rgb(24 24 23 / 0.10);
+  --overlay-veil: rgb(24 24 23 / 0.26);
 }
 
-/* ── Tema oscuro: carbón cálido, nunca negro azulado ──────────────────── */
+/* ── Oscuro: carbón neutro, sin marrón ────────────────────────────────── */
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --desk: #1a1815;
-  --desk-deep: #141210;
-  --surface: #221f1b;
-  --surface-sunken: #1c1a17;
-  --surface-raised: #2a2621;
+  --desk: #151617;
+  --desk-deep: #101112;
+  --surface: #1d1f20;
+  --surface-sunken: #191b1c;
+  --surface-raised: #242627;
 
-  --ink: #efe9e0;
-  --ink-2: #b5aa9c;
-  --ink-3: #8b8174;
-  --ink-4: #6d645a;
+  --ink: #ecedec;
+  --ink-2: #a8aaa9;
+  --ink-3: #7e8180;
+  --ink-4: #636665;
 
-  --line: #332e28;
-  --line-strong: #453e36;
-  --line-hair: #2a2621;
+  --line: #2e3132;
+  --line-strong: #3f4344;
+  --line-hair: #262829;
 
   --paper: #ffffff;
-  --paper-edge: rgb(0 0 0 / 0.5);
+  --paper-edge: rgb(0 0 0 / 0.55);
   --paper-shadow:
-    0 1px 2px rgb(0 0 0 / 0.45),
-    0 8px 20px rgb(0 0 0 / 0.4),
-    0 26px 60px rgb(0 0 0 / 0.42);
+    0 1px 2px rgb(0 0 0 / 0.5),
+    0 10px 26px rgb(0 0 0 / 0.45),
+    0 30px 70px rgb(0 0 0 / 0.45);
 
-  --accent-tint: color-mix(in srgb, var(--accent) 22%, transparent);
+  --accent-tint: color-mix(in srgb, var(--accent) 20%, transparent);
   --accent-tint-strong: color-mix(in srgb, var(--accent) 30%, transparent);
-  --accent-line: color-mix(in srgb, var(--accent) 58%, transparent);
-  --accent-text: color-mix(in srgb, var(--accent) 72%, #ffd9c0);
+  --accent-line: color-mix(in srgb, var(--accent) 55%, transparent);
+  --accent-text: color-mix(in srgb, var(--accent) 62%, #ffd9d2);
 
-  --danger: #e0705c;
+  --danger: #e2685c;
   --ok: #6cb37f;
-  --warn: #d9a45c;
+  --warn: #d5a45f;
 
-  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
-  --overlay-veil: rgb(10 8 6 / 0.55);
+  --float-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 10px 26px rgb(0 0 0 / 0.4);
+  --overlay-veil: rgb(6 7 8 / 0.55);
 }
 
-/* El tema "sistema" hereda del esquema del sistema operativo. */
 @media (prefers-color-scheme: dark) {
   :root[data-theme="auto"] {
     color-scheme: dark;
-    --desk: #1a1815;
-    --desk-deep: #141210;
-    --surface: #221f1b;
-    --surface-sunken: #1c1a17;
-    --surface-raised: #2a2621;
-    --ink: #efe9e0;
-    --ink-2: #b5aa9c;
-    --ink-3: #8b8174;
-    --ink-4: #6d645a;
-    --line: #332e28;
-    --line-strong: #453e36;
-    --line-hair: #2a2621;
-    --paper-edge: rgb(0 0 0 / 0.5);
+    --desk: #151617;
+    --desk-deep: #101112;
+    --surface: #1d1f20;
+    --surface-sunken: #191b1c;
+    --surface-raised: #242627;
+    --ink: #ecedec;
+    --ink-2: #a8aaa9;
+    --ink-3: #7e8180;
+    --ink-4: #636665;
+    --line: #2e3132;
+    --line-strong: #3f4344;
+    --line-hair: #262829;
+    --paper-edge: rgb(0 0 0 / 0.55);
     --paper-shadow:
-      0 1px 2px rgb(0 0 0 / 0.45),
-      0 8px 20px rgb(0 0 0 / 0.4),
-      0 26px 60px rgb(0 0 0 / 0.42);
-    --accent-tint: color-mix(in srgb, var(--accent) 22%, transparent);
+      0 1px 2px rgb(0 0 0 / 0.5),
+      0 10px 26px rgb(0 0 0 / 0.45),
+      0 30px 70px rgb(0 0 0 / 0.45);
+    --accent-tint: color-mix(in srgb, var(--accent) 20%, transparent);
     --accent-tint-strong: color-mix(in srgb, var(--accent) 30%, transparent);
-    --accent-line: color-mix(in srgb, var(--accent) 58%, transparent);
-    --accent-text: color-mix(in srgb, var(--accent) 72%, #ffd9c0);
-    --danger: #e0705c;
+    --accent-line: color-mix(in srgb, var(--accent) 55%, transparent);
+    --accent-text: color-mix(in srgb, var(--accent) 62%, #ffd9d2);
+    --danger: #e2685c;
     --ok: #6cb37f;
-    --warn: #d9a45c;
-    --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
-    --overlay-veil: rgb(10 8 6 / 0.55);
+    --warn: #d5a45f;
+    --float-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 10px 26px rgb(0 0 0 / 0.4);
+    --overlay-veil: rgb(6 7 8 / 0.55);
   }
 }
 
-/* ── Superficie del escritorio ────────────────────────────────────────── */
-/* Cuatro acabados discretos: ninguno decorativo, todos a muy bajo contraste. */
+/* ── Acabado del escritorio ───────────────────────────────────────────── */
 :root[data-bg="plain"] { --desk-layer: none; --desk-layer-size: auto; }
-
 :root[data-bg="gradient"] {
-  /* Viñeta neutra: profundidad de mesa, no degradado de marca. */
-  --desk-layer: radial-gradient(120% 90% at 50% 0%, transparent 45%, var(--desk-deep) 100%);
+  --desk-layer: radial-gradient(120% 85% at 50% 0%, transparent 50%, var(--desk-deep) 100%);
   --desk-layer-size: auto;
 }
-
 :root[data-bg="dots"] {
   --desk-layer: radial-gradient(currentColor 0.7px, transparent 0.7px);
   --desk-layer-size: 20px 20px;
-  --desk-layer-ink: color-mix(in srgb, var(--ink) 13%, transparent);
+  --desk-layer-ink: color-mix(in srgb, var(--ink) 12%, transparent);
 }
-
 :root[data-bg="grid"] {
   --desk-layer:
-    linear-gradient(to right, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px);
   --desk-layer-size: 24px 24px, 24px 24px;
 }
 
-/* "Textura del escritorio" desactivada: superficies planas, sólo filetes. */
 :root[data-transparency="off"] {
   --desk-layer: none;
   --paper-shadow: 0 0 0 1px var(--paper-edge);
-  --shadow-panel: none;
+  --float-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

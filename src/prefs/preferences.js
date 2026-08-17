@@ -5,15 +5,16 @@ const STORAGE_KEY = 'folio.preferences.v1';
 
 export const DEFAULT_PREFERENCES = Object.freeze({
   theme: 'auto',            // auto | light | dark
-  accent: '#c66a32',        // cobre quemado
+  accent: '#d94b38',        // bermellón editorial
   background: 'gradient',   // plain | gradient | dots | grid
   transparency: true,       // textura y sombras de la mesa de trabajo
-  inspector: true,          // inspector visible
   toolStyle: null,          // last used annotation appearance
 });
 
 /** Acentos de versiones anteriores que se reemplazan por el cobre de Folio. */
-const LEGACY_ACCENTS = new Set(['#4f7cff', '#7c5cff', '#12a594', '#2e9e5b', '#d98324', '#e0455c']);
+const LEGACY_ACCENTS = new Set([
+  '#4f7cff', '#7c5cff', '#12a594', '#2e9e5b', '#d98324', '#e0455c', '#c66a32',
+]);
 
 /**
  * User preferences: theme, accent, workspace background, transparency and the
@@ -74,13 +75,12 @@ export class Preferences extends Emitter {
   /** Reflects preferences onto the document root and body. */
   apply() {
     const root = document.documentElement;
-    const { theme, accent, background, transparency, inspector } = this.#values;
+    const { theme, accent, background, transparency } = this.#values;
     root.dataset.theme = theme === 'auto' ? 'auto' : theme;
     root.dataset.bg = background;
     root.dataset.transparency = transparency ? 'on' : 'off';
     root.style.setProperty('--accent', accent);
     root.style.setProperty('--accent-ink', pickReadableInk(accent));
-    if (document.body) document.body.dataset.inspector = inspector ? 'on' : 'off';
   }
 }
 

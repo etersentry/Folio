@@ -18,6 +18,10 @@ import { mountOutline } from './ui/outline.js';
 import { mountProperties } from './ui/properties.js';
 import { mountAppearance } from './ui/appearance.js';
 import { mountShortcuts } from './ui/shortcuts.js';
+import { mountDrawer } from './ui/drawer.js';
+import { mountQuickbar } from './ui/quickbar.js';
+import { mountFilmstrip } from './ui/filmstrip.js';
+import { mountMenu } from './ui/menu.js';
 import { openExportDialog } from './ui/exportDialog.js';
 import { openLibraryDialog, openShortcutsDialog } from './ui/dialogs.js';
 import { confirmDialog, promptDialog } from './ui/modal.js';
@@ -236,6 +240,14 @@ export class App {
   #mountUi() {
     const { store, tools, view, commands } = this;
 
+    // Drawer: propiedades avanzadas y navegador del documento.
+    this.drawer = mountDrawer({
+      root: $('#drawer'),
+      titleEl: $('#drawerTitle'),
+      closeButton: $('#drawerClose'),
+      panes: { props: $('#paneProps'), doc: $('#paneDoc') },
+    });
+
     mountToolPanel({ host: $('#toolGrid'), tools });
     mountOutline({ host: $('#outline'), store, thumbs: this.thumbs });
     mountProperties({
@@ -244,8 +256,39 @@ export class App {
       scopeEl: $('#propsScope'),
       store, tools, commands,
     });
-    mountAppearance({ button: $('#btnAppearance'), prefs: this.prefs });
+
+    // Barra contextual flotante: sustituye al inspector permanente.
+    this.quickbar = mountQuickbar({
+      host: $('#quickbar'),
+      stage: $('#stage'),
+      store, tools, view,
+      drawer: this.drawer,
+    });
+    this.quickbar.setCommands(commands);
+    this.textEditor.on('open', () => this.quickbar.suspend(true));
+    this.textEditor.on('close', () => this.quickbar.suspend(false));
+
+    // Tira de páginas: navegación diaria del documento.
+    this.filmstrip = mountFilmstrip({
+      host: $('#strip'),
+      prevButton: $('#stripPrev'),
+      nextButton: $('#stripNext'),
+      store,
+      thumbs: this.thumbs,
+      onOpenSection: () => this.drawer.open('doc'),
+    });
+
+    this.appearance = mountAppearance({ prefs: this.prefs });
     mountShortcuts({ store, tools, view, textEditor: this.textEditor, commands });
+
+    mountMenu({
+      button: $('#btnMore'),
+      items: [
+        { label: 'Guardar como…', kbd: 'Ctrl+Shift+S', onClick: () => commands.save({ saveAs: true }) },
+        { label: 'Apariencia', onClick: () => this.appearance.open($('#btnMore')) },
+        { label: 'Atajos de teclado', onClick: () => commands.showShortcuts() },
+      ],
+    });
 
     $('#btnUndo').addEventListener('click', () => store.undo());
     $('#btnRedo').addEventListener('click', () => store.redo());
@@ -253,23 +296,9 @@ export class App {
     $('#btnOpen').addEventListener('click', () => commands.open());
     $('#btnSave').addEventListener('click', () => commands.save());
     $('#btnExport').addEventListener('click', () => commands.exportDialog());
-    $('#btnHelp').addEventListener('click', () => commands.showShortcuts());
-
-    // El inspector se puede plegar: el documento gana toda la mesa.
-    const inspectorBtn = $('#btnInspector');
-    const syncInspector = () => {
-      const visible = this.prefs.values.inspector !== false;
-      document.body.dataset.inspector = visible ? 'on' : 'off';
-      inspectorBtn.setAttribute('aria-pressed', String(visible));
-      inspectorBtn.title = visible ? 'Ocultar inspector' : 'Mostrar inspector';
-    };
-    inspectorBtn.addEventListener('click', () => {
-      this.prefs.set({ inspector: this.prefs.values.inspector === false });
-      syncInspector();
-    });
-    this.prefs.on('change', syncInspector);
-    syncInspector();
+    $('#btnDocument').addEventListener('click', () => this.drawer.toggle('doc'));
     $('#btnAddSection').addEventListener('click', () => store.addSection());
+    $('#btnAddPage').addEventListener('click', () => store.addPage());
 
     $('#btnImportImages').addEventListener('click', () => $('#fileImages').click());
     $('#fileImages').addEventListener('change', (event) => {
@@ -300,6 +329,20 @@ export class App {
       $('#btnZoomFit').textContent = `${Math.round(zoom * 100)}%`;
       $('#btnZoomFit').title = fit ? 'Ajustado a la ventana' : 'Ajustar a la ventana';
     });
+
+    // La bandeja de instrumentos se coloca junto al papel, no junto al borde.
+    const rail = document.querySelector('.rail');
+    const desk = $('#desk');
+    const placeRail = () => {
+      const page = $('#pageShell').getBoundingClientRect();
+      const deskRect = desk.getBoundingClientRect();
+      rail.style.left = `${Math.max(8, Math.round(page.left - deskRect.left - 44))}px`;
+    };
+    view.on('zoom', placeRail);
+    view.on('painted', placeRail);
+    $('#stage').addEventListener('scroll', placeRail, { passive: true });
+    window.addEventListener('resize', placeRail);
+    placeRail();
 
     // Ctrl + wheel zooms; plain wheel keeps scrolling the stage.
     $('#stage').addEventListener('wheel', (event) => {
@@ -404,6 +447,7 @@ export class App {
 
   #syncAll() {
     $('#projectName').value = this.store.doc.name;
+    this.quickbar?.render();
     this.thumbs.invalidateAll();
     this.#syncDocStatus();
     this.#syncHint();

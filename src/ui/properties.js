@@ -1,8 +1,9 @@
 import { el, clear, icon } from '../core/dom.js';
 import { PALETTE, OBJECT_TYPES } from '../core/constants.js';
-import { TOOL_BY_ID } from '../tools/registry.js';
+import { TOOL_BY_ID, labelForObject } from '../tools/registry.js';
 import { boundsOf, isSegment } from '../core/geometry.js';
 import { round } from '../core/util.js';
+import { createStyleApplier } from '../tools/styleBridge.js';
 
 const LAYER_ICONS = {
   front: ['M12 4 4 9l8 5 8-5z', 'M4 15l8 5 8-5'],
@@ -14,41 +15,9 @@ const LAYER_ICONS = {
  * selected it edits the defaults the active tool will use next.
  */
 export function mountProperties({ host, titleEl, scopeEl, store, tools, commands }) {
-  let liveOpen = false;
-
-  const beginLive = () => {
-    if (liveOpen) return;
-    store.beginLive('object:style');
-    liveOpen = true;
-  };
-  const endLive = () => {
-    if (!liveOpen) return;
-    store.endLive({ changed: true });
-    liveOpen = false;
-  };
-
-  /** Applies a style change to the selection, or to the tool defaults. */
-  function apply(styleKey, value, { live = false } = {}) {
-    const ids = store.selectionIds;
-    if (!ids.length) {
-      tools.setStyle({ [styleKey]: value });
-      return;
-    }
-    const patch = (obj) => objectPatchFor(obj, styleKey, value);
-    if (live) {
-      beginLive();
-      store.updateObjects(ids, patch, { reason: 'object:style', live: true });
-    } else {
-      if (liveOpen) {
-        store.updateObjects(ids, patch, { reason: 'object:style', live: true });
-        endLive();
-      } else {
-        store.updateObjects(ids, patch, { reason: 'object:style' });
-      }
-    }
-    // Keep drawing defaults aligned with the last explicit choice.
-    tools.setStyle({ [styleKey]: value });
-  }
+  // Appearance edits go through the shared bridge, so the floating quick bar
+  // and this drawer always produce identical document changes.
+  const { apply } = createStyleApplier({ store, tools });
 
   /* ── Control builders ────────────────────────────────────────────────── */
 
@@ -347,7 +316,7 @@ export function mountProperties({ host, titleEl, scopeEl, store, tools, commands
     clear(host);
 
     if (selected.length) {
-      const label = selected.length === 1 ? typeLabel(selected[0].type) : `${selected.length} objetos`;
+      const label = selected.length === 1 ? labelForObject(selected[0].type) : `${selected.length} objetos`;
       titleEl.textContent = label;
       scopeEl.textContent = 'Selección';
       for (const block of selectionControls(selected)) host.append(block);
@@ -383,48 +352,7 @@ export function mountProperties({ host, titleEl, scopeEl, store, tools, commands
 
 /* ── Helpers ───────────────────────────────────────────────────────────── */
 
-function typeLabel(type) {
-  return {
-    image: 'Imagen',
-    box: 'Recuadro',
-    marker: 'Marcador',
-    highlight: 'Resaltador',
-    arrow: 'Flecha',
-    line: 'Línea',
-    ellipse: 'Elipse',
-    text: 'Texto',
-  }[type] ?? 'Objeto';
-}
-
 function normalizeHex(value) {
   const hex = String(value ?? '').trim();
   return /^#[0-9a-f]{6}$/i.test(hex) ? hex : '#000000';
-}
-
-/** Maps an appearance key onto the fields a given object type understands. */
-function objectPatchFor(obj, styleKey, value) {
-  switch (styleKey) {
-    case 'color':
-      return 'stroke' in obj ? { stroke: value } : null;
-    case 'fill':
-      return 'fill' in obj ? { fill: value } : null;
-    case 'textColor':
-      return obj.type === OBJECT_TYPES.text ? { color: value } : null;
-    case 'strokeWidth':
-      return 'strokeWidth' in obj ? { strokeWidth: value } : null;
-    case 'fontSize':
-      return obj.type === OBJECT_TYPES.text ? { fontSize: value } : null;
-    case 'markerOpacity':
-    case 'highlightOpacity':
-    case 'opacity':
-      return 'opacity' in obj ? { opacity: value } : null;
-    case 'markerHeight':
-      return obj.type === OBJECT_TYPES.marker ? { h: value } : null;
-    case 'frame':
-      return obj.type === OBJECT_TYPES.image ? { frame: { ...obj.frame, ...value } } : null;
-    case 'textBorder':
-      return obj.type === OBJECT_TYPES.text ? { border: { ...obj.border, ...value } } : null;
-    default:
-      return null;
-  }
 }

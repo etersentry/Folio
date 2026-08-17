@@ -132,6 +132,17 @@ export class PageView extends Emitter {
     };
   }
 
+  /** Document rectangle → client coordinates (used to anchor floating UI). */
+  toScreenRect(bounds) {
+    const rect = this.#overlayCanvas.getBoundingClientRect();
+    return {
+      x: rect.left + bounds.x * this.#zoom,
+      y: rect.top + bounds.y * this.#zoom,
+      w: bounds.w * this.#zoom,
+      h: bounds.h * this.#zoom,
+    };
+  }
+
   setCursor(cursor) {
     this.#overlayCanvas.style.cursor = cursor;
   }

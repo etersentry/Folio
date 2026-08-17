@@ -89,6 +89,20 @@ export const TOOLS = [
 export const TOOL_BY_ID = Object.fromEntries(TOOLS.map((t) => [t.id, t]));
 export const TOOL_BY_KEY = Object.fromEntries(TOOLS.map((t) => [t.key.toLowerCase(), t]));
 
+/** Nombre visible de cada tipo de objeto (barra contextual y drawer). */
+export const OBJECT_LABELS = Object.freeze({
+  image: 'Imagen',
+  box: 'Recuadro',
+  marker: 'Marcador',
+  highlight: 'Resaltador',
+  arrow: 'Flecha',
+  line: 'Línea',
+  ellipse: 'Elipse',
+  text: 'Texto',
+});
+
+export const labelForObject = (type) => OBJECT_LABELS[type] ?? 'Objeto';
+
 export const DEFAULT_STYLE = Object.freeze({
   color: '#ff3b30',
   fill: '#ffcc00',
