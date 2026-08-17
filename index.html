@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Folio — Anotación y composición de documentos</title>
+<meta name="description" content="Herramienta local-first para anotar capturas y componer documentos rápidamente." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234f7cff'/><rect x='9' y='7' width='14' height='18' rx='2' fill='white'/><rect x='12' y='12' width='8' height='2' rx='1' fill='%234f7cff'/><rect x='12' y='16' width='8' height='2' rx='1' fill='%234f7cff'/></svg>" />
+<link rel="stylesheet" href="./styles/tokens.css" />
+<link rel="stylesheet" href="./styles/base.css" />
+<link rel="stylesheet" href="./styles/layout.css" />
+<link rel="stylesheet" href="./styles/components.css" />
+</head>
+<body>
+<a class="skip-link" href="#stage">Saltar al lienzo</a>
+
+<!-- ───────────────────────────── Top bar ───────────────────────────── -->
+<header class="topbar glass" role="banner">
+  <div class="topbar__group topbar__brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" fill="currentColor" opacity=".18"/><path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    </span>
+    <label class="visually-hidden" for="projectName">Nombre del proyecto</label>
+    <input id="projectName" class="project-name" type="text" value="Proyecto sin título" spellcheck="false" autocomplete="off" />
+    <span id="dirtyDot" class="dirty-dot" title="Cambios sin guardar" hidden></span>
+  </div>
+
+  <div class="topbar__group" role="group" aria-label="Historial">
+    <button class="btn icon" id="btnUndo" title="Deshacer (Ctrl+Z)" aria-label="Deshacer" disabled>
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 7 4 12l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h9a6 6 0 1 1 0 12h-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button class="btn icon" id="btnRedo" title="Rehacer (Ctrl+Y)" aria-label="Rehacer" disabled>
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="m15 7 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12h-9a6 6 0 1 0 0 12h2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="topbar__group" role="group" aria-label="Documento">
+    <button class="btn" id="btnNew">Nuevo</button>
+    <button class="btn" id="btnOpen">Abrir</button>
+    <button class="btn" id="btnSave">Guardar</button>
+    <button class="btn primary" id="btnExport">Exportar</button>
+  </div>
+
+  <div class="topbar__group" role="group" aria-label="Imágenes">
+    <button class="btn" id="btnImportImages">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="10" r="1.6" fill="currentColor"/><path d="m4 17 5-5 4 4 3-2 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      Imagen
+    </button>
+    <input type="file" id="fileImages" accept="image/*" multiple hidden />
+    <input type="file" id="fileProject" accept=".folio,.json,application/json" hidden />
+  </div>
+
+  <div class="topbar__group topbar__right">
+    <div class="zoom-control" role="group" aria-label="Zoom">
+      <button class="btn icon sm" id="btnZoomOut" aria-label="Alejar">−</button>
+      <button class="btn sm zoom-value" id="btnZoomFit" title="Ajustar a la ventana">100%</button>
+      <button class="btn icon sm" id="btnZoomIn" aria-label="Acercar">+</button>
+    </div>
+    <button class="btn icon" id="btnAppearance" title="Apariencia" aria-label="Apariencia" aria-haspopup="dialog" aria-expanded="false">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>
+    </button>
+    <button class="btn icon" id="btnHelp" title="Atajos de teclado" aria-label="Atajos de teclado">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.7-.9 1.3v.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="16.4" r="1" fill="currentColor"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ───────────────────────────── Main layout ───────────────────────── -->
+<main class="workspace">
+  <!-- Left panel -->
+  <aside class="panel panel--left glass" aria-label="Herramientas y estructura">
+    <section class="panel__block">
+      <h2 class="panel__title">Herramientas</h2>
+      <div class="tool-grid" id="toolGrid" role="toolbar" aria-label="Herramientas de anotación"></div>
+    </section>
+
+    <section class="panel__block panel__block--grow">
+      <div class="panel__title-row">
+        <h2 class="panel__title">Documento</h2>
+        <button class="btn sm ghost" id="btnAddSection" title="Nueva sección">+ Sección</button>
+      </div>
+      <div class="outline" id="outline" role="tree" aria-label="Secciones y páginas"></div>
+    </section>
+  </aside>
+
+  <!-- Canvas -->
+  <section class="stage-area">
+    <div class="stage" id="stage" tabindex="-1">
+      <div class="page-shell" id="pageShell">
+        <canvas id="pageCanvas" class="page-canvas"></canvas>
+        <canvas id="overlayCanvas" class="overlay-canvas" aria-label="Lienzo de la página" role="img"></canvas>
+        <textarea id="textEditor" class="text-editor" spellcheck="false" hidden aria-label="Editor de texto"></textarea>
+      </div>
+    </div>
+    <div class="stage-hint glass" id="stageHint">
+      Pega una captura con <kbd>Ctrl</kbd>+<kbd>V</kbd>, arrástrala aquí o usa <b>Imagen</b>
+    </div>
+  </section>
+
+  <!-- Right panel -->
+  <aside class="panel panel--right glass" aria-label="Propiedades">
+    <div class="panel__block panel__block--grow">
+      <div class="panel__title-row">
+        <h2 class="panel__title" id="propsTitle">Propiedades</h2>
+        <span class="chip" id="propsScope">Herramienta</span>
+      </div>
+      <div class="props" id="props"></div>
+    </div>
+  </aside>
+</main>
+
+<footer class="statusbar glass">
+  <span id="statusSave" class="status-item">Listo</span>
+  <span class="status-sep" aria-hidden="true">·</span>
+  <span id="statusDoc" class="status-item"></span>
+  <span class="status-spacer"></span>
+  <span id="statusHint" class="status-item status-item--muted"></span>
+</footer>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div class="modal-root" id="modalRoot" hidden></div>
+<div class="drop-veil" id="dropVeil" hidden><div class="drop-veil__inner">Suelta las imágenes para insertarlas</div></div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
